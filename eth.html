@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<title>web3.js_test</title>
+	<script src="web3.min.js"></script>
+	<script src="ethereumjs-tx-1.3.3.min.js"></script>
+ </head>
+<body>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<form class="form-horizontal">
+					<div class="control-group">
+						 <label class="control-label" for="add">您的地址：</label>
+						<div class="controls">
+							<input id="add" type="text" value="0x245Bbd75c8ed14Dd81525990F0544b608890e943" /><label id=yue></label>
+						</div>
+					</div>
+					<div class="control-group">
+						 <label class="control-label" for="add2">对方地址：</label>
+						<div class="controls">
+							<input id="add2" type="text" />
+						</div>
+					<div class="control-group">
+						 <label class="control-label" for="value">转账金额：</label>
+						<div class="controls">
+							<input id="value" type="text" />
+						</div>
+					</div>
+					<div class="control-group">
+						 <label class="control-label" for="pass">您的私钥：</label>
+						<div class="controls">
+							<input id="pass" type="password" />
+						</div>
+					</div>
+					<div class="control-group">
+						 <label class="control-label" for="value">交易备注(永久保存在以太坊上)：</label>
+						<div class="controls">
+							<input id="data" type="text" />
+						</div>
+					</div>
+					</div>
+					<div class="control-group">
+						<div class="controls">
+							<button type="button" class="btn" onclick="searchvalue()">查询余额</button>
+							<button type="button" class="btn" onclick="trans()" >确认转账</button>
+							<br><label id=tran></label>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		function searchvalue(){
+			document.getElementById("tran").innerHTML="正在提交查询，不要重复提交了！出于学习考虑查询代码<br>使用的依旧是以太坊交互模式。<br><br>第一次写前端，多多包涵哈。"
+			web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/b0647e7cb8c24d39978b5e8109403caa"));
+			web3.eth.getBalance(document.getElementById("add").value,(erro,re)=>{
+				if(erro===null){
+					console.log(web3.utils.fromWei(re,"ether"));
+					document.getElementById("yue").innerHTML="您的余额：  "+web3.utils.fromWei(re,"ether")
+				}else{
+					alert(erro)
+				}
+			})
+			// 0.116031763961039422
+			// 0.116031763961039422
+			// 0.115821763960939422
+			// 0x245Bbd75c8ed14Dd81525990F0544b608890e943
+			// 0x3f9b92df1e8351b978d65fa61991071d571ad024
+
+			console.log(web3.version)
+			}
+
+		function trans(){
+			web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/b0647e7cb8c24d39978b5e8109403caa"));
+			document.getElementById("tran").innerHTML="正在提交转账，本站小，慢的一匹<br>请不要重复提交。<br>赞助联系：azinexy"
+			tx={
+			    to: document.getElementById("add2").value,
+			    value: Web3.utils.toWei(document.getElementById("value").value,"ether"),
+			    gas: 210000,
+			    gasPrice:'10000000000',
+			    gasLimit:99000,
+			    nonce: web3.eth.getTransactionCount(document.getElementById("add").value),
+			    data:Web3.utils.toHex(document.getElementById("data").value),
+			}
+
+			console.log(tx)
+
+			web3.eth.accounts.signTransaction(tx,document.getElementById("pass").value,(erro,re)=>{
+				if(erro===null){
+					web3.eth.sendSignedTransaction(re.rawTransaction,(erro1,re1)=>{
+						if(erro1===null){
+							document.getElementById("tran").innerHTML="转账提交成功！交易地址："+re1
+						}else{
+							document.getElementById("tran").innerHTML="交易失败，不是站点崩溃就是域名问题。<br>便宜没好货啊！"
+							console.log("转账创建失败："+erro1)
+						}
+					})
+				}else{
+					document.getElementById("tran").innerHTML="交易失败，不是站点崩溃就是域名问题。<br>便宜没好货啊！"
+					console.log("签名创建过程失败："+erro)
+				}
+			})
+			console.log("a")}
+	</script>
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
